@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://fa4q3kx7q0vq"]
 
+[ext_resource type="Script" uid="uid://di21m84oo3cyt" path="res://scripts/character_blueprint/character_blueprint.gd" id="1_81fh6"]
 [ext_resource type="Texture2D" uid="uid://vsdag7rx41yx" path="res://assets/test character/_Idle.png" id="1_d4aqs"]
 [ext_resource type="Texture2D" uid="uid://dohetlicy31a4" path="res://assets/test character/_AttackCombo.png" id="1_me5og"]
 
@@ -425,6 +426,8 @@ size = Vector2(7, 9)
 size = Vector2(25, 25)
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1221661097]
+collision_layer = 2
+script = ExtResource("1_81fh6")
 
 [node name="Physics Collision" type="CollisionShape2D" parent="." unique_id=1587236598]
 position = Vector2(-5, -19)
@@ -437,7 +440,6 @@ texture_filter = 3
 position = Vector2(0, -40)
 texture = ExtResource("1_d4aqs")
 hframes = 10
-frame = 9
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Pivot" unique_id=2144989805]
 root_node = NodePath("../..")
