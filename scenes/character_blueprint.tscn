@@ -65,7 +65,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Physics Collision:position")
+tracks/4/path = NodePath("PhysicsCollision:position")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -177,7 +177,7 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Physics Collision:position")
+tracks/5/path = NodePath("PhysicsCollision:position")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -281,7 +281,7 @@ tracks/5/keys = {
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Physics Collision:position")
+tracks/6/path = NodePath("PhysicsCollision:position")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -385,7 +385,7 @@ tracks/5/keys = {
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Physics Collision:position")
+tracks/6/path = NodePath("PhysicsCollision:position")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -425,11 +425,13 @@ size = Vector2(7, 9)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ejfai"]
 size = Vector2(25, 25)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1221661097]
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1221661097 node_paths=PackedStringArray("Pivot", "PhysicsCollision")]
 collision_layer = 2
 script = ExtResource("1_81fh6")
+Pivot = NodePath("Pivot")
+PhysicsCollision = NodePath("PhysicsCollision")
 
-[node name="Physics Collision" type="CollisionShape2D" parent="." unique_id=1587236598]
+[node name="PhysicsCollision" type="CollisionShape2D" parent="." unique_id=1587236598]
 position = Vector2(-5, -19)
 shape = SubResource("CapsuleShape2D_d4aqs")
 
