@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://fa4q3kx7q0vq"]
 
-[ext_resource type="Script" uid="uid://di21m84oo3cyt" path="res://scripts/character_blueprint/character_blueprint.gd" id="1_81fh6"]
+[ext_resource type="Script" uid="uid://8eqft3ua3rwd" path="res://scripts/test_character/character_blueprint.gd" id="1_81fh6"]
 [ext_resource type="Texture2D" uid="uid://vsdag7rx41yx" path="res://assets/test character/_Idle.png" id="1_d4aqs"]
 [ext_resource type="Texture2D" uid="uid://dohetlicy31a4" path="res://assets/test character/_AttackCombo.png" id="1_me5og"]
 
@@ -425,11 +425,12 @@ size = Vector2(7, 9)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ejfai"]
 size = Vector2(25, 25)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1221661097 node_paths=PackedStringArray("Pivot", "PhysicsCollision")]
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=671161997 node_paths=PackedStringArray("pivot", "physics_collision", "input_timer")]
 collision_layer = 2
 script = ExtResource("1_81fh6")
-Pivot = NodePath("Pivot")
-PhysicsCollision = NodePath("PhysicsCollision")
+pivot = NodePath("Pivot")
+physics_collision = NodePath("PhysicsCollision")
+input_timer = NodePath("InputTimer")
 
 [node name="PhysicsCollision" type="CollisionShape2D" parent="." unique_id=1587236598]
 position = Vector2(-5, -19)
@@ -464,3 +465,7 @@ visible = false
 position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_ejfai")
 disabled = true
+
+[node name="InputTimer" type="Timer" parent="." unique_id=1306469446]
+wait_time = 0.15
+one_shot = true
