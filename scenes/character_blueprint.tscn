@@ -425,12 +425,11 @@ size = Vector2(7, 9)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ejfai"]
 size = Vector2(25, 25)
 
-[node name="CharacterBody2D" type="CharacterBody2D" unique_id=671161997 node_paths=PackedStringArray("pivot", "physics_collision", "input_timer")]
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=671161997 node_paths=PackedStringArray("pivot", "physics_collision")]
 collision_layer = 2
 script = ExtResource("1_81fh6")
 pivot = NodePath("Pivot")
 physics_collision = NodePath("PhysicsCollision")
-input_timer = NodePath("InputTimer")
 
 [node name="PhysicsCollision" type="CollisionShape2D" parent="." unique_id=1587236598]
 position = Vector2(-5, -19)
@@ -465,7 +464,3 @@ visible = false
 position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_ejfai")
 disabled = true
-
-[node name="InputTimer" type="Timer" parent="." unique_id=1306469446]
-wait_time = 0.15
-one_shot = true
