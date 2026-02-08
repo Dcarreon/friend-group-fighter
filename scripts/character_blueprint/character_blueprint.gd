@@ -77,6 +77,12 @@ func _input(event: InputEvent) -> void:
 					_push_input_queue(game_input.LEFT_RELEASED,"game_left_released")
 				"game_right":
 					_push_input_queue(game_input.RIGHT_RELEASED,"game_right_released")
+				"game_light":
+					_push_input_queue(game_input.LIGHT_RELEASED,"game_light_released")
+				"game_medium":
+					_push_input_queue(game_input.MEDIUM_RELEASED,"game_medium_released")
+				"game_heavy":
+					_push_input_queue(game_input.HEAVY_RELEASED,"game_heavy_released")
 
 func _physics_process(delta: float) -> void:
 	var directional_input_vector : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
@@ -95,13 +101,13 @@ func _physics_process(delta: float) -> void:
 
 		if sum_of_inputs == 0: #either down_left or up_right
 			if directional_input_vector.y < 0:
-				_push_input_queue(game_input.UP_RIGHT,"null")
+				_push_input_queue(game_input.UP_RIGHT,"game_up_right")
 			else:
-				_push_input_queue(game_input.DOWN_LEFT,"null")
+				_push_input_queue(game_input.DOWN_LEFT,"game_down_left")
 
 		if sum_of_inputs > 0: #either down_right, down or right
 			if sum_of_inputs > 1:
-				_push_input_queue(game_input.DOWN_RIGHT,"null")
+				_push_input_queue(game_input.DOWN_RIGHT,"game_down_right")
 			elif directional_input_vector.y > 0:
 				_push_input_queue(game_input.DOWN,"game_down")
 			else:
@@ -109,7 +115,7 @@ func _physics_process(delta: float) -> void:
 
 		if sum_of_inputs < 0: #either up_left, up or left
 			if sum_of_inputs < -1:
-				_push_input_queue(game_input.UP_LEFT,"null")
+				_push_input_queue(game_input.UP_LEFT,"game_up_left")
 			elif directional_input_vector.y < 0:
 				_push_input_queue(game_input.UP,"game_up")
 			else:
