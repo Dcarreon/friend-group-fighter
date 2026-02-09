@@ -27,17 +27,18 @@ enum attack_type {
 
 var input_queue_size : int = 4
 var input_queue : Array[game_input]
-var input_delay_timer : Timer
 
 # SIGNALS ------------------------------------------------------
 
-signal GameInputPressed(input : game_input, default_input : String)
+signal GameInputPressed(input : game_input)
+signal SpriteFlipped
 
 # FUNCTIONS ------------------------------------------------------
 
 func _flip_sprite() -> void:
 	pivot.scale.x *= -1.0
 	physics_collision.scale.x *= -1.0
+	SpriteFlipped.emit()
 
 func _facing_direction() -> facing:
 	if pivot.scale.x < 0:
@@ -56,70 +57,73 @@ func _new_timer(time : float, old_timer : Timer = null) -> Timer:
 	
 	return new_timer
 
-func _push_input_queue(input : game_input, default_input : String) -> void:
+func _push_input_queue(input : game_input) -> void:
 	input_queue.push_front(input)
-	GameInputPressed.emit(input, default_input)
+	GameInputPressed.emit(input)
 	
 	if input_queue.size() > input_queue_size:
 		input_queue.pop_back()
 
-	print(default_input)
+	print(input)
 
 func _input(event: InputEvent) -> void:
 	for action in InputMap.get_actions():
 		if event.is_action_released(action):
 			match action:
 				"game_up":
-					_push_input_queue(game_input.UP_RELEASED,"game_up_released")
+					_push_input_queue(game_input.UP_RELEASED)
 				"game_down":
-					_push_input_queue(game_input.DOWN_RELEASED,"game_down_released")
+					_push_input_queue(game_input.DOWN_RELEASED)
 				"game_left":
-					_push_input_queue(game_input.LEFT_RELEASED,"game_left_released")
+					_push_input_queue(game_input.LEFT_RELEASED)
 				"game_right":
-					_push_input_queue(game_input.RIGHT_RELEASED,"game_right_released")
+					_push_input_queue(game_input.RIGHT_RELEASED)
 				"game_light":
-					_push_input_queue(game_input.LIGHT_RELEASED,"game_light_released")
+					_push_input_queue(game_input.LIGHT_RELEASED)
 				"game_medium":
-					_push_input_queue(game_input.MEDIUM_RELEASED,"game_medium_released")
+					_push_input_queue(game_input.MEDIUM_RELEASED)
 				"game_heavy":
-					_push_input_queue(game_input.HEAVY_RELEASED,"game_heavy_released")
+					_push_input_queue(game_input.HEAVY_RELEASED)
 
-func _physics_process(delta: float) -> void:
-	var directional_input_vector : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
-
-	if Input.is_action_just_pressed("game_light"):
-		_push_input_queue(game_input.LIGHT,"game_light")
-
-	if Input.is_action_just_pressed("game_medium"):
-		_push_input_queue(game_input.MEDIUM,"game_medium")
-
-	if Input.is_action_just_pressed("game_heavy"):
-		_push_input_queue(game_input.HEAVY,"game_heavy")
-
+func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
 	if directional_input_vector.x != 0 || directional_input_vector.y != 0:
 		var sum_of_inputs : float = directional_input_vector.x + directional_input_vector.y
 
 		if sum_of_inputs == 0: #either down_left or up_right
 			if directional_input_vector.y < 0:
-				_push_input_queue(game_input.UP_RIGHT,"game_up_right")
+				_push_input_queue(game_input.UP_RIGHT)
 			else:
-				_push_input_queue(game_input.DOWN_LEFT,"game_down_left")
+				_push_input_queue(game_input.DOWN_LEFT)
 
 		if sum_of_inputs > 0: #either down_right, down or right
 			if sum_of_inputs > 1:
-				_push_input_queue(game_input.DOWN_RIGHT,"game_down_right")
+				_push_input_queue(game_input.DOWN_RIGHT)
 			elif directional_input_vector.y > 0:
-				_push_input_queue(game_input.DOWN,"game_down")
+				_push_input_queue(game_input.DOWN)
 			else:
-				_push_input_queue(game_input.RIGHT,"game_right")
+				_push_input_queue(game_input.RIGHT)
 
 		if sum_of_inputs < 0: #either up_left, up or left
 			if sum_of_inputs < -1:
-				_push_input_queue(game_input.UP_LEFT,"game_up_left")
+				_push_input_queue(game_input.UP_LEFT)
 			elif directional_input_vector.y < 0:
-				_push_input_queue(game_input.UP,"game_up")
+				_push_input_queue(game_input.UP)
 			else:
-				_push_input_queue(game_input.LEFT,"game_left")
+				_push_input_queue(game_input.LEFT)
+
+func _physics_process(delta: float) -> void:
+	var directional_input_vector : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
+
+	if Input.is_action_just_pressed("game_light"):
+		_push_input_queue(game_input.LIGHT)
+
+	if Input.is_action_just_pressed("game_medium"):
+		_push_input_queue(game_input.MEDIUM)
+
+	if Input.is_action_just_pressed("game_heavy"):
+		_push_input_queue(game_input.HEAVY)
+
+	_queue_directional_inputs(directional_input_vector)
 
 # CLASSES ------------------------------------------------------
 
@@ -134,7 +138,8 @@ class SpecialInput:
 
 	func _initialize(character: CharacterBlueprint) -> void:
 		player = character
-		player.GameInputPressed.connect(_input_detect)
+		player.GameInputPressed.connect(_match_first_input)
+		player.SpriteFlipped.connect(_reset_stack)
 		input_timer = player._new_timer(0.15)
 		_reset_stack()
 
@@ -148,10 +153,17 @@ class SpecialInput:
 			for input in input_list_left:
 				input_stack.push_back(input)
 
-	func _input_detect(event : game_input, default_input : String) -> void:
-		input_timer.start()
+	func _match_first_input(event : game_input, default_input : String) -> void:
+		if not input_stack.is_empty() && input_timer.is_stopped():
+			if event == input_stack.front():
+				input_stack.pop_front()
+				input_timer.start()
+				input_previous = event
+		else:
+			_match_consecutive_inputs(event)
 
-		if !input_stack.is_empty() && !input_timer.is_stopped():
+	func _match_consecutive_inputs(event : game_input) -> void:
+		if not input_stack.is_empty() && not input_timer.is_stopped():
 			if event == input_stack.front():
 				input_stack.pop_front()
 				input_timer.start()
