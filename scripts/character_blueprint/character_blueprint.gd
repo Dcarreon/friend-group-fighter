@@ -49,41 +49,24 @@ func _new_timer(time : float, old_timer : Timer = null) -> Timer:
 	if old_timer != null:
 		old_timer.queue_free()
 		old_timer = null
-	
+
 	var new_timer = Timer.new()
 	new_timer.wait_time = time
 	new_timer.one_shot = true
 	add_child(new_timer)
-	
+
 	return new_timer
 
 func _push_input_queue(input : game_input) -> void:
-	input_queue.push_front(input)
-	GameInputPressed.emit(input)
-	
+	if not input_queue.is_empty():
+		if input != input_queue.front():
+			input_queue.push_front(input)
+			GameInputPressed.emit(input)
+	else:
+		input_queue.push_front(input)
+
 	if input_queue.size() > input_queue_size:
 		input_queue.pop_back()
-
-	print(input)
-
-func _input(event: InputEvent) -> void:
-	for action in InputMap.get_actions():
-		if event.is_action_released(action):
-			match action:
-				"game_up":
-					_push_input_queue(game_input.UP_RELEASED)
-				"game_down":
-					_push_input_queue(game_input.DOWN_RELEASED)
-				"game_left":
-					_push_input_queue(game_input.LEFT_RELEASED)
-				"game_right":
-					_push_input_queue(game_input.RIGHT_RELEASED)
-				"game_light":
-					_push_input_queue(game_input.LIGHT_RELEASED)
-				"game_medium":
-					_push_input_queue(game_input.MEDIUM_RELEASED)
-				"game_heavy":
-					_push_input_queue(game_input.HEAVY_RELEASED)
 
 func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
 	if directional_input_vector.x != 0 || directional_input_vector.y != 0:
@@ -111,6 +94,28 @@ func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
 			else:
 				_push_input_queue(game_input.LEFT)
 
+func _queue_input_release(event : InputEvent) -> void:
+	for action in InputMap.get_actions():
+		if event.is_action_released(action):
+			match action:
+				"game_up":
+					_push_input_queue(game_input.UP_RELEASED)
+				"game_down":
+					_push_input_queue(game_input.DOWN_RELEASED)
+				"game_left":
+					_push_input_queue(game_input.LEFT_RELEASED)
+				"game_right":
+					_push_input_queue(game_input.RIGHT_RELEASED)
+				"game_light":
+					_push_input_queue(game_input.LIGHT_RELEASED)
+				"game_medium":
+					_push_input_queue(game_input.MEDIUM_RELEASED)
+				"game_heavy":
+					_push_input_queue(game_input.HEAVY_RELEASED)
+
+func _input(event: InputEvent) -> void:
+	_queue_input_release(event)
+
 func _physics_process(delta: float) -> void:
 	var directional_input_vector : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
 
@@ -132,7 +137,6 @@ class SpecialInput:
 	var input_list_right : Array[game_input]
 	var input_list_left : Array[game_input]
 	var input_stack : Array[game_input]
-	var input_previous : game_input = game_input.NOINPUT
 	var input_timer : Timer
 	signal input_completed
 
@@ -141,6 +145,7 @@ class SpecialInput:
 		player.GameInputPressed.connect(_match_first_input)
 		player.SpriteFlipped.connect(_reset_stack)
 		input_timer = player._new_timer(0.15)
+		input_timer.timeout.connect(_reset_stack)
 		_reset_stack()
 
 	func _reset_stack() -> void:
@@ -153,12 +158,11 @@ class SpecialInput:
 			for input in input_list_left:
 				input_stack.push_back(input)
 
-	func _match_first_input(event : game_input, default_input : String) -> void:
+	func _match_first_input(event : game_input) -> void:
 		if not input_stack.is_empty() && input_timer.is_stopped():
 			if event == input_stack.front():
 				input_stack.pop_front()
 				input_timer.start()
-				input_previous = event
 		else:
 			_match_consecutive_inputs(event)
 
@@ -167,14 +171,10 @@ class SpecialInput:
 			if event == input_stack.front():
 				input_stack.pop_front()
 				input_timer.start()
-				input_previous = event
 				if input_stack.is_empty():
 					input_completed.emit()
 					_reset_stack()
 					input_timer.stop()
-			elif event == input_previous:
-				pass
 			else:
-				input_previous = game_input.NOINPUT
 				input_timer.stop()
 				_reset_stack()
