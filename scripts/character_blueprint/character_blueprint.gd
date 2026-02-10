@@ -23,10 +23,14 @@ enum attack_type {
 # VARIABLES ------------------------------------------------------
 
 @export var pivot : Node2D
-@export var physics_collision : Node2D
+@export var physics_collision : CollisionShape2D
+@export var hurt_boxes : Area2D
 
 var input_queue_size : int = 4
 var input_queue : Array[game_input]
+var is_crouching : bool
+var is_blocking : bool
+var jump_velocity : float
 
 # SIGNALS ------------------------------------------------------
 
@@ -34,6 +38,12 @@ signal GameInputPressed(input : game_input)
 signal SpriteFlipped
 
 # FUNCTIONS ------------------------------------------------------
+
+func _change_is_crouching(switch : bool) -> void:
+	is_crouching = switch
+
+func _change_is_blocking(switch : bool) -> void:
+	is_blocking = switch
 
 func _flip_sprite() -> void:
 	pivot.scale.x *= -1.0
