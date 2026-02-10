@@ -15,7 +15,7 @@ func _ready() -> void:
 	Hadoken.input_list_left = [game_input.DOWN,game_input.DOWN_LEFT,game_input.DOWN_RELEASED,game_input.LEFT,game_input.LEFT_RELEASED,game_input.LIGHT]
 	Hadoken._initialize(self)
 	Hadoken.input_completed.connect(_hadoken_completed)
-	
+
 	Reload = SpecialInput.new()
 	Reload.input_list_right = [game_input.DOWN,game_input.DOWN_RELEASED,game_input.DOWN,game_input.DOWN_RELEASED,game_input.LIGHT]
 	Reload.input_list_left = [game_input.DOWN,game_input.DOWN_RELEASED,game_input.DOWN,game_input.DOWN_RELEASED,game_input.LIGHT]

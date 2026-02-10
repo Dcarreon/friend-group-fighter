@@ -68,12 +68,12 @@ func _push_input_queue(input : game_input) -> void:
 	if input_queue.size() > input_queue_size:
 		input_queue.pop_back()
 
-func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
-	if directional_input_vector.x != 0 || directional_input_vector.y != 0:
-		var sum_of_inputs : float = directional_input_vector.x + directional_input_vector.y
+func _queue_directional_inputs(directional_input : Vector2) -> void:
+	if directional_input.x != 0 || directional_input.y != 0:
+		var sum_of_inputs : float = directional_input.x + directional_input.y
 
 		if sum_of_inputs == 0: #either down_left or up_right
-			if directional_input_vector.y < 0:
+			if directional_input.y < 0:
 				_push_input_queue(game_input.UP_RIGHT)
 			else:
 				_push_input_queue(game_input.DOWN_LEFT)
@@ -81,7 +81,7 @@ func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
 		if sum_of_inputs > 0: #either down_right, down or right
 			if sum_of_inputs > 1:
 				_push_input_queue(game_input.DOWN_RIGHT)
-			elif directional_input_vector.y > 0:
+			elif directional_input.y > 0:
 				_push_input_queue(game_input.DOWN)
 			else:
 				_push_input_queue(game_input.RIGHT)
@@ -89,7 +89,7 @@ func _queue_directional_inputs(directional_input_vector : Vector2) -> void:
 		if sum_of_inputs < 0: #either up_left, up or left
 			if sum_of_inputs < -1:
 				_push_input_queue(game_input.UP_LEFT)
-			elif directional_input_vector.y < 0:
+			elif directional_input.y < 0:
 				_push_input_queue(game_input.UP)
 			else:
 				_push_input_queue(game_input.LEFT)
@@ -117,7 +117,7 @@ func _input(event: InputEvent) -> void:
 	_queue_input_release(event)
 
 func _physics_process(delta: float) -> void:
-	var directional_input_vector : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
+	var directional_input : Vector2 = Input.get_vector("game_left","game_right","game_up","game_down")
 
 	if Input.is_action_just_pressed("game_light"):
 		_push_input_queue(game_input.LIGHT)
@@ -128,7 +128,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("game_heavy"):
 		_push_input_queue(game_input.HEAVY)
 
-	_queue_directional_inputs(directional_input_vector)
+	_queue_directional_inputs(directional_input)
 
 # CLASSES ------------------------------------------------------
 
@@ -138,10 +138,12 @@ class SpecialInput:
 	var input_list_left : Array[game_input]
 	var input_stack : Array[game_input]
 	var input_timer : Timer
+	var enabled : bool
 	signal input_completed
 
-	func _initialize(character: CharacterBlueprint) -> void:
+	func _initialize(character: CharacterBlueprint, set_enabled : bool = true) -> void:
 		player = character
+		enabled = set_enabled
 		player.GameInputPressed.connect(_match_first_input)
 		player.SpriteFlipped.connect(_reset_stack)
 		input_timer = player._new_timer(0.15)
@@ -159,12 +161,13 @@ class SpecialInput:
 				input_stack.push_back(input)
 
 	func _match_first_input(event : game_input) -> void:
-		if not input_stack.is_empty() && input_timer.is_stopped():
-			if event == input_stack.front():
-				input_stack.pop_front()
-				input_timer.start()
-		else:
-			_match_consecutive_inputs(event)
+		if enabled:
+			if not input_stack.is_empty() && input_timer.is_stopped():
+				if event == input_stack.front():
+					input_stack.pop_front()
+					input_timer.start()
+			else:
+				_match_consecutive_inputs(event)
 
 	func _match_consecutive_inputs(event : game_input) -> void:
 		if not input_stack.is_empty() && not input_timer.is_stopped():
