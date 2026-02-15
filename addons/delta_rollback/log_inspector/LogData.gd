@@ -1,7 +1,7 @@
 @tool
 extends RefCounted
 
-const Logger = preload("res://addons/delta_rollback/Logger.gd")
+const RollBackLogger = preload("res://addons/delta_rollback/Logger.gd")
 
 class StateData:
 	var tick: int
@@ -173,7 +173,7 @@ func _loader_thread_function(input: Array) -> void:
 			continue
 
 		if header == null:
-			if data['log_type'] == Logger.LogType.HEADER:
+			if data['log_type'] == RollBackLogger.LogType.HEADER:
 				header = data
 
 				header['peer_id'] = int(header['peer_id'])
@@ -224,7 +224,7 @@ func _add_log_entry(log_entry: Dictionary, peer_id: int) -> void:
 	max_tick = int(max(max_tick, tick))
 
 	match log_entry['log_type'] as int:
-		Logger.LogType.INPUT:
+		RollBackLogger.LogType.INPUT:
 			var input_data: InputData
 			if not input.has(tick):
 				input_data = InputData.new(tick, log_entry['input'])
@@ -234,7 +234,7 @@ func _add_log_entry(log_entry: Dictionary, peer_id: int) -> void:
 				if not input_data.compare_input(peer_id, log_entry['input']) and not tick in mismatches:
 					mismatches.append(tick)
 
-		Logger.LogType.STATE:
+		RollBackLogger.LogType.STATE:
 			var state_data: StateData
 			if not state.has(tick):
 				state_data = StateData.new(tick, log_entry['state'])
@@ -244,7 +244,7 @@ func _add_log_entry(log_entry: Dictionary, peer_id: int) -> void:
 				if not state_data.compare_state(peer_id, log_entry['state']) and not tick in mismatches:
 					mismatches.append(tick)
 		
-		Logger.LogType.EVENT:
+		RollBackLogger.LogType.EVENT:
 			var event = log_entry['event']
 			for path in event.keys():
 				if path == "":
@@ -257,7 +257,7 @@ func _add_log_entry(log_entry: Dictionary, peer_id: int) -> void:
 						
 					events[path][tick] = event[path]
 
-		Logger.LogType.FRAME:
+		RollBackLogger.LogType.FRAME:
 			log_entry.erase('log_type')
 			var frame_number = frame_counter[peer_id]
 			var frame_data := FrameData.new(frame_number, log_entry['frame_type'], log_entry)
@@ -350,4 +350,3 @@ func get_frame_by_time(peer_id: int, time: int) -> FrameData:
 		return last_matching_frame.clone_with_offset(peer_time_offset)
 
 	return last_matching_frame
-
