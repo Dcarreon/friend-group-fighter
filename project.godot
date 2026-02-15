@@ -19,6 +19,14 @@ run/main_scene="uid://bl4kxnma2wqiy"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SyncManager="*uid://xohxvtt4jjfo"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/delta_rollback/plugin.cfg")
+
 [input]
 
 game_left={
