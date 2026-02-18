@@ -1,15 +1,16 @@
 extends Node2D
 
 
-const DUMMYNETWORKADAPTOR = preload("res://addons/delta_rollback/DummyNetworkAdaptor.gd")
+const DUMMY_NETWORK_ADAPTOR = preload("res://addons/delta_rollback/DummyNetworkAdaptor.gd")
 
 
 @onready var local_or_online_menu := $CanvasLayer/LocalOrOnlineMenu
 
+
 func _on_local_play_button_pressed() -> void:
 	local_or_online_menu.visible = false
 	#$ClientPlayer.input_prefix = "player_two_"
-	SyncManager.network_adaptor = DUMMYNETWORKADAPTOR.new()
+	SyncManager.network_adaptor = DUMMY_NETWORK_ADAPTOR.new()
 	SyncManager.start()
 
 
