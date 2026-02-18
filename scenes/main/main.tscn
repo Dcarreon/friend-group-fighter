@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://da8opdlk3lpms"]
 
 [ext_resource type="Script" uid="uid://rtb17mnd1osv" path="res://scripts/main_menu/main_menu_singleton.gd" id="1_hyk8p"]
+[ext_resource type="PackedScene" uid="uid://dke0660881tiy" path="res://scenes/test_character/test_character.tscn" id="2_iuonh"]
 
 [node name="Main" type="Node2D" unique_id=2039596441]
 
@@ -29,6 +30,9 @@ text = "Local"
 [node name="OnlinePlayButton" type="Button" parent="MainMenuSingleton/CanvasLayer/LocalOrOnlineMenu" unique_id=612336420]
 layout_mode = 2
 text = "Online"
+
+[node name="CharacterBody2D" parent="." unique_id=1696506944 groups=["network_sync"] instance=ExtResource("2_iuonh")]
+position = Vector2(372, 294)
 
 [connection signal="pressed" from="MainMenuSingleton/CanvasLayer/LocalOrOnlineMenu/LocalPlayButton" to="MainMenuSingleton" method="_on_local_play_button_pressed"]
 [connection signal="pressed" from="MainMenuSingleton/CanvasLayer/LocalOrOnlineMenu/OnlinePlayButton" to="MainMenuSingleton" method="_on_online_play_button_pressed"]

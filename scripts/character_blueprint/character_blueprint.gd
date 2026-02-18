@@ -4,6 +4,7 @@ class_name CharacterBlueprint
 
 var input_prefix := "player_one_"
 
+
 # MAIN LOOP FUNCTIONS
 
 
@@ -17,15 +18,17 @@ func _get_local_input() -> Dictionary:
 	
 	if input_vector != Vector2.ZERO:
 		input["input_vector"] = input_vector
+#	if Input.is_action_just_pressed(input_prefix + "button_press"): 
+#		input["button_press"] = true
 	
 	return input
 
 
-func _predict_remote_input(previous_input: Dictionary, ticks_since_real_input: int) -> Dictionary:
-	var input : Dictionary
+#func _predict_remote_input(previous_input: Dictionary, ticks_since_real_input: int) -> Dictionary:
+#	var input : Dictionary
 	#input = previous_input.duplicate()
 	#input.erase("input")
-	return input
+#	return input
 
 
 func _network_process(input : Dictionary) -> void: # _process and _physics_process replacement
