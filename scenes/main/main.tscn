@@ -1,12 +1,18 @@
 [gd_scene format=3 uid="uid://da8opdlk3lpms"]
 
 [ext_resource type="Script" uid="uid://rtb17mnd1osv" path="res://scripts/main_menu/main_menu_singleton.gd" id="1_hyk8p"]
+[ext_resource type="Texture2D" uid="uid://ctfmr3du2exyq" path="res://assets/test area/Back_ggj_judgement.png" id="1_k2fmo"]
 [ext_resource type="PackedScene" uid="uid://dke0660881tiy" path="res://scenes/test_character/test_character.tscn" id="2_iuonh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iuonh"]
 size = Vector2(1216, 20)
 
 [node name="Main" type="Node2D" unique_id=2039596441]
+
+[node name="Background" type="Sprite2D" parent="." unique_id=1858398402]
+texture_filter = 1
+position = Vector2(578, 238)
+texture = ExtResource("1_k2fmo")
 
 [node name="MainMenuSingleton" type="Node2D" parent="." unique_id=1832908159]
 script = ExtResource("1_hyk8p")
@@ -35,9 +41,15 @@ layout_mode = 2
 text = "Online"
 
 [node name="CharacterBody2D" parent="." unique_id=1696506944 groups=["network_sync"] instance=ExtResource("2_iuonh")]
-position = Vector2(573, 152)
+position = Vector2(573, 300)
 collision_layer = 2
 collision_mask = 3
+
+[node name="Camera2D" type="Camera2D" parent="CharacterBody2D" unique_id=2097000142]
+offset = Vector2(0, -70)
+zoom = Vector2(2, 2)
+position_smoothing_enabled = true
+position_smoothing_speed = 2.0
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=457581992]
 collision_mask = 2
